@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Full Shows Player</title>
+  <style>
+    body { font-family: Arial; background:#111; color:#fff; padding:20px; }
+    .episode { margin-bottom:20px; padding:15px; background:#1c1c1c; border-radius:10px; }
+    audio { width:100%; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<h1>Latest Full Shows</h1>
+<div id="episodes">Loading...</div>
+
+<script>
+const RSS_URL = "https://archive.org/services/collection-rss.php?collection=NeilLevin";
+
+// use rss2json to bypass CORS
+const API = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(RSS_URL);
+
+fetch(API)
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("episodes");
+    container.innerHTML = "";
+
+    data.items.forEach(item => {
+      // grab audio file (enclosure)
+      const audioUrl = item.enclosure.link;
+
+      const div = document.createElement("div");
+      div.className = "episode";
+
+      div.innerHTML = `
+        <h3>${item.title}</h3>
+        <p>${item.pubDate}</p>
+        <audio controls src="${audioUrl}"></audio>
+      `;
+
+      container.appendChild(div);
+    });
+  });
+</script>
+
+</body>
+</html>
